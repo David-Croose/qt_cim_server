@@ -38,7 +38,6 @@ void MainWindow::server_New_Connect()
 
 bool got_0x0B_Flag = false;
 quint32 gotFrameCnt;
-quint32 frameTotal;
 quint32 dataTotalLen;
 quint32 totalBytes;
 
@@ -125,7 +124,6 @@ void MainWindow::socket_Read_Data()
 
                 dataTotalLen -= 32;
 
-                frameTotal = (dataTotalLen) / 850 + 1;
                 QString str = "got <0x0B> fream_head";
                 str += ",total_ecgdata_bytes=";
                 str += QString::number(dataTotalLen);
@@ -141,7 +139,16 @@ void MainWindow::socket_Read_Data()
             if(got_0x0B_Flag == true)
             {
                 totalBytes += buffer.count();
-                if(++gotFrameCnt >= frameTotal || totalBytes >= dataTotalLen + 2)
+
+                QString str = "frame seq:";
+                str += QString::number(gotFrameCnt);
+                str += ",len=";
+                str += QString::number(buffer.count());
+                str += ",totbytes=";
+                str += QString::number(totalBytes);
+                ui->textBrowser->append(str);
+
+                if(totalBytes >= dataTotalLen + 2)
                 {
                     QByteArray sendBuffer;
                     quint32 i, sum = 0, len = 29;
@@ -167,14 +174,6 @@ void MainWindow::socket_Read_Data()
                     socket->write(sendBuffer);
                     ui->textBrowser->append("sent <0x0B>");
                 }
-
-                QString str = "frame seq:";
-                str += QString::number(gotFrameCnt);
-                str += ",len=";
-                str += QString::number(buffer.count());
-                str += ",totbytes=";
-                str += QString::number(totalBytes);
-                ui->textBrowser->append(str);
             }
             else
             {
@@ -206,7 +205,6 @@ void MainWindow::on_pushButton_2_clicked()
     // 重置各个全局变量
     got_0x0B_Flag = false;
     gotFrameCnt = 0;
-    frameTotal = 0;
     dataTotalLen = 0;
     totalBytes = 0;
 }
