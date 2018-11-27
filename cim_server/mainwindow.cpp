@@ -61,7 +61,7 @@ void MainWindow::socket_Read_Data()
                 quint32 i, sum = 0, len = 29;
 
                 sendBuffer.resize(len);
-                sendBuffer.fill(0, 29);
+                sendBuffer.fill(0, len);
                 sendBuffer[0] = 0xEB;
                 sendBuffer[1] = 0x90;
                 sendBuffer[2] = 0x08;
@@ -88,7 +88,7 @@ void MainWindow::socket_Read_Data()
                 quint32 i, sum = 0, len = 29;
 
                 sendBuffer.resize(len);
-                sendBuffer.fill(0, 29);
+                sendBuffer.fill(0, len);
                 sendBuffer[0] = 0xEB;
                 sendBuffer[1] = 0x90;
                 sendBuffer[2] = 0x08;
@@ -121,7 +121,7 @@ void MainWindow::socket_Read_Data()
                 dataTotalLen |= buffer[1];
 
                 frameTotal = (dataTotalLen - 32) / 850 + 1;
-                ui->textBrowser->append("got <B> head");
+                ui->textBrowser->append("got <0B> fream_head");
             }
             else
             {
@@ -133,13 +133,13 @@ void MainWindow::socket_Read_Data()
             if(got_0x0B_Flag == true)
             {
                 totalBytes += buffer.count();
-                if(++gotFrameCnt >= frameTotal)
+                if(++gotFrameCnt >= frameTotal || totalBytes >= dataTotalLen)
                 {
                     QByteArray sendBuffer;
                     quint32 i, sum = 0, len = 29;
 
                     sendBuffer.resize(len);
-                    sendBuffer.fill(0, 29);
+                    sendBuffer.fill(0, len);
                     sendBuffer[0] = 0xEB;
                     sendBuffer[1] = 0x90;
                     sendBuffer[2] = 0x08;
@@ -157,8 +157,9 @@ void MainWindow::socket_Read_Data()
                     sendBuffer[28] = sum;
 
                     socket->write(sendBuffer);
-                    ui->textBrowser->append("sent <B>");
+                    ui->textBrowser->append("sent <0B>");
                 }
+
                 QString str = "frame seq:";
                 str += QString::number(gotFrameCnt);
                 str += ",len=";
@@ -200,4 +201,30 @@ void MainWindow::on_pushButton_2_clicked()
     frameTotal = 0;
     dataTotalLen = 0;
     totalBytes = 0;
+}
+
+void MainWindow::on_pushButton_3_clicked()
+{
+    QByteArray sendBuffer;
+    quint32 i, sum = 0, len = 29;
+
+    sendBuffer.resize(len);
+    sendBuffer.fill(0, len);
+    sendBuffer[0] = 0xEB;
+    sendBuffer[1] = 0x90;
+    sendBuffer[2] = 0x08;
+    sendBuffer[3] = 0x0B;
+    sendBuffer[4] = len >> 24;
+    sendBuffer[5] = len >> 16;
+    sendBuffer[6] = len >> 8;
+    sendBuffer[7] = len;
+    sendBuffer[26] = 0;
+    for(i = 2; i < 29 - 2; i++)
+    {
+        sum += sendBuffer[i];
+    }
+    sendBuffer[27] = sum >> 8;
+    sendBuffer[28] = sum;
+
+    socket->write(sendBuffer);
 }
