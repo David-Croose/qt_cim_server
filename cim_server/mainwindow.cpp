@@ -139,6 +139,7 @@ void MainWindow::socket_Read_Data()
             if(got_0x0B_Flag == true)
             {
                 totalBytes += buffer.count();
+                ++gotFrameCnt;
 
                 QString str = "frame seq:";
                 str += QString::number(gotFrameCnt);
@@ -173,6 +174,12 @@ void MainWindow::socket_Read_Data()
 
                     socket->write(sendBuffer);
                     ui->textBrowser->append("sent <0x0B>");
+
+                    // 重置各个全局变量
+                    got_0x0B_Flag = false;
+                    gotFrameCnt = 0;
+                    dataTotalLen = 0;
+                    totalBytes = 0;
                 }
             }
             else
@@ -201,6 +208,18 @@ void MainWindow::on_pushButton_2_clicked()
     ui->lineEdit->clear();
     ui->textBrowser->clear();
     ui->pushButton->setText("start");
+
+    // 重置各个全局变量
+    got_0x0B_Flag = false;
+    gotFrameCnt = 0;
+    dataTotalLen = 0;
+    totalBytes = 0;
+}
+
+void MainWindow::on_pushButton_4_clicked()
+{
+    // 重置部分控件
+    ui->textBrowser->clear();
 
     // 重置各个全局变量
     got_0x0B_Flag = false;
