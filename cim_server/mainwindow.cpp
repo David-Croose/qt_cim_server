@@ -33,6 +33,7 @@ void MainWindow::server_New_Connect()
     clientPort = socket->peerPort();
 
     clientInfo = clientIP + ":" + QString::number(clientPort);
+    clientInfo.remove("::ffff:");
     ui->lineEdit->setText(clientInfo);
 }
 
@@ -131,7 +132,7 @@ void MainWindow::socket_Read_Data()
             }
             else
             {
-                ui->statusBar->showMessage("recv buffer[3] err!", 4000);
+                ui->textBrowser->append("recv buffer[3] err!");
             }
         }
         else
@@ -184,7 +185,7 @@ void MainWindow::socket_Read_Data()
             }
             else
             {
-                ui->statusBar->showMessage("recv err!", 4000);
+                ui->textBrowser->append("recv err!");
             }
         }
     }
@@ -192,7 +193,7 @@ void MainWindow::socket_Read_Data()
 
 void MainWindow::on_pushButton_clicked()
 {
-    server->listen(QHostAddress::Any, 6677);
+    server->listen(QHostAddress::Any, ui->lineEdit_2->text().toInt());
     ui->pushButton->setText("working...");
 }
 
