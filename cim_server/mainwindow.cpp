@@ -35,6 +35,8 @@ void MainWindow::server_New_Connect()
     clientInfo = clientIP + ":" + QString::number(clientPort);
     clientInfo.remove("::ffff:");
     ui->lineEdit->setText(clientInfo);
+
+    ui->textBrowser->append("new TCP client connected");
 }
 
 bool got_0x0B_Flag = false;
